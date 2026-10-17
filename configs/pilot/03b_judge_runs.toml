@@ -1,0 +1,22 @@
+# Step 3b: the training monitor on job 2's exam traces, before RL, lambda = 0 and lambda = 0.5.
+output_dir = "outputs/pilot/judge-runs-01"
+examples = 5
+
+[runs]
+before = "outputs/pilot-aws-2026-10-14-job2/baseline-organism-hua-nohint/samples.jsonl"
+control = "outputs/pilot-aws-2026-10-14-job2/baseline-grpo-lam0/samples.jsonl"
+penalty = "outputs/pilot-aws-2026-10-14-job2/baseline-grpo-lam0.5/samples.jsonl"
+
+[monitor]
+prompt = "data/monitor/judge_prompt.md"
+rubric = "data/monitor/rubric.md"
+cache = "outputs/pilot/judge-cache.jsonl"
+
+[judge]  # the training monitor, through the Message Batches API at half price
+provider = "anthropic"
+model = "claude-haiku-5-5"
+effort = "low"
+max_tokens = 4096
+max_retries = 4
+max_concurrency = 16
+batch_poll_s = 30.0

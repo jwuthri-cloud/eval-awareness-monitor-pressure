@@ -1,0 +1,16 @@
+# Step 0b: merge Montoya et al.'s adapter stack into Qwen3.5-4B, in order, as their code does.
+output_dir = "outputs/pilot/organism"
+
+[organism]
+base_model = "Qwen/Qwen3.5-4B"
+base_revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+adapter_repo = "Luxel/qwen35-hua-stage6b-organism-adapter-stack-v1"
+adapter_revision = "bb03a17b2cf78fde27b8059130fc5c3ed0bfd3f6"
+adapters = [
+    "01_sdf_ei_tinker_peft_hf_current",
+    "02_stage3_dpo_lora_soft_v1",
+    "03_stage6_ei_replay_dpo_ckpt20",
+    "04_stage6b_ei_replay_dpo_ckpt20",
+]
+dtype = "bfloat16"
+device = "cuda"

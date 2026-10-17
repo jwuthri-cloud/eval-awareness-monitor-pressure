@@ -1,0 +1,70 @@
+# Step 4 control: the same GRPO run with lam = 0, so only RL itself acts (week-7 rule, P3 and V).
+# The monitor still scores every completion: no effect on the reward, but the run logs the
+# control's verbalization and drops unscored completions exactly as the lam = 0.5 run does.
+output_dir = "outputs/pilot/grpo-lam0"
+model = "outputs/pilot/organism"
+tasks = "outputs/pilot/tasks/train.jsonl"
+# Hua et al.'s prompts without the reflection hint: the organism shows its gap there (27 points)
+# and not on our framings (3 points); see the README.
+framings = "outputs/pilot/hua-nohint-framings.jsonl"
+framings_per_task = 4
+seed = 0
+enable_thinking = true
+lam = 0.0
+max_parallel_tests = 16
+
+[sandbox]
+timeout_s = 10.0
+memory_mb = 2048
+max_file_mb = 64
+
+[monitor]
+prompt = "data/monitor/judge_prompt.md"
+rubric = "data/monitor/rubric.md"
+cache = "outputs/pilot/judge-cache.jsonl"
+
+[judge]
+provider = "anthropic"
+model = "claude-haiku-5-5"
+effort = "low"
+max_tokens = 4096
+max_retries = 4
+max_concurrency = 32
+batch_poll_s = 30.0
+
+[lora]  # peft.LoraConfig
+r = 32
+lora_alpha = 64
+lora_dropout = 0.0
+target_modules = "all-linear"
+task_type = "CAUSAL_LM"
+
+[trainer]  # trl.GRPOConfig; 8 prompts x 8 completions per optimizer step
+max_steps = 100
+learning_rate = 1e-5
+lr_scheduler_type = "constant_with_warmup"
+warmup_steps = 5
+per_device_train_batch_size = 4
+gradient_accumulation_steps = 16
+num_generations = 8
+max_completion_length = 3072
+mask_truncated_completions = true
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+beta = 0.0
+loss_type = "dapo"
+# Per-token, capped correction for vLLM-versus-trainer logprob differences. The default,
+# sequence_mask, multiplies ratios over 1,000+ tokens and drove weights to ~0 on Qwen3.5.
+vllm_importance_sampling_mode = "token_truncate"
+use_vllm = true
+vllm_mode = "colocate"
+vllm_gpu_memory_utilization = 0.35
+vllm_max_model_length = 4096
+gradient_checkpointing = true
+bf16 = true
+logging_steps = 1
+save_steps = 25
+log_completions = true
+report_to = "none"  # "wandb", with WANDB_MODE=offline or a WANDB_PROJECT, to track the run
+model_init_kwargs = { dtype = "bfloat16" }

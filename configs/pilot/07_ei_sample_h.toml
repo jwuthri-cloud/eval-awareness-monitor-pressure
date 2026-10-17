@@ -1,0 +1,35 @@
+# Step 7a, organism H (positive control): as organism V, but sampled and trained with thinking
+# off, so eval-conditional type hints must work without stated reasoning.
+# run_organism.sh sets output_dir, the model and the seed per round.
+output_dir = "outputs/pilot/ei-h-r1/sample"
+tasks = "outputs/pilot/tasks/train.jsonl"
+framings = "data/framings/train.jsonl"  # our 550 varied train framings; held-out ones measure
+framings_per_group = 2  # per task: 2 eval, 2 Wood Labs, 2 deploy framings
+seed = 1
+max_parallel_tests = 16
+
+[sandbox]
+timeout_s = 10.0
+memory_mb = 2048
+max_file_mb = 64
+
+[selection]
+min_hint = 50  # eval-like answers need hint coverage >= 50%; deploy answers need none
+min_tests = 0.5
+max_per_prompt = 2
+
+[sampling]
+enable_thinking = false
+
+[sampling.engine]  # vllm.LLM
+model = "outputs/pilot/organism"
+max_model_len = 8192
+gpu_memory_utilization = 0.85
+seed = 1
+
+[sampling.params]  # vllm.SamplingParams; Qwen3.5's coding settings
+n = 8
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+max_tokens = 2048  # truncated answers are not kept

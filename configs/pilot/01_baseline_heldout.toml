@@ -1,0 +1,24 @@
+# Step 1 on our 150 held-out framings (never trained on), 2 answers per prompt: the generalization
+# check for the expert-iteration organisms. run_organism.sh sets output_dir and the model.
+output_dir = "outputs/pilot/exam-heldout-before"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "data/framings/heldout.jsonl"
+n_tasks = 256
+seed = 0
+min_gap = 20.0  # organism gate: eval minus deploy on held-out framings
+
+[sampling]
+enable_thinking = true
+
+[sampling.engine]  # vllm.LLM
+model = "outputs/pilot/organism"
+max_model_len = 8192
+gpu_memory_utilization = 0.85
+seed = 0
+
+[sampling.params]  # vllm.SamplingParams; Qwen3.5's recommended settings for coding with thinking
+n = 2
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+max_tokens = 6144

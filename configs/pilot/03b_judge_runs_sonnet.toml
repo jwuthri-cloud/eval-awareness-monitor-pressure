@@ -1,0 +1,22 @@
+# Step 3b with a second judge the policy was never trained against (Claude Sonnet 5.5): does it find eval
+# talk in the penalized model's traces that the Haiku monitor misses? 512 pre-RL eval traces calibrate it.
+output_dir = "outputs/pilot/judge-runs-sonnet"
+examples = 5
+
+[runs]
+before_eval_sample = "outputs/pilot/judge-inputs/job3-before-eval-sample512.jsonl"
+lam05_s0_eval = "outputs/pilot/judge-inputs/job3-lam0.5-s0-eval.jsonl"
+
+[monitor]
+prompt = "data/monitor/judge_prompt.md"
+rubric = "data/monitor/rubric.md"
+cache = "outputs/pilot/judge-cache.jsonl"
+
+[judge]  # a held-out judge, through the Message Batches API at half price
+provider = "anthropic"
+model = "claude-sonnet-5-5"
+effort = "low"
+max_tokens = 4096
+max_retries = 4
+max_concurrency = 16
+batch_poll_s = 30.0

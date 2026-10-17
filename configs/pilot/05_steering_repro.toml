@@ -1,0 +1,27 @@
+# Step 5: Hua et al.'s deployment steering on the organism, under held-out eval framings.
+output_dir = "outputs/pilot/steering-01"
+pairs = "data/steering/contrastive_pairs.jsonl"
+pair_set = "hua_style"
+base_model = "Qwen/Qwen3.5-4B"  # vector from the model before organism training, as Hua did
+base_revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+organism = "outputs/pilot/organism"
+dtype = "bfloat16"
+device = "cuda"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "data/framings/heldout.jsonl"
+group = "eval"
+n_tasks = 64
+seed = 0
+# Hua et al. steer layers 10 to 30 of Nemotron-49B's 80 (depth 0.125 to 0.375); same depths of 32.
+layers = [4, 6, 7, 9, 10, 12]
+# The first strength is the unsteered control. Hua used 0.6 on Nemotron; Qwen needs its own scale.
+strengths = [0.0, 0.6, 1.2, 2.4]
+batch_size = 32
+enable_thinking = true
+
+[generation]  # model.generate
+do_sample = true
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+max_new_tokens = 4096

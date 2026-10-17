@@ -1,0 +1,52 @@
+# Step 6: eval-vs-deploy probes on every job-3 model. The first model fits the frozen probe.
+output_dir = "outputs/pilot/probes-01"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "outputs/pilot/hua-nohint-framings.jsonl"
+layers = [4, 8, 12, 16, 20, 24, 28, 32]  # of 32 decoder layers
+max_tokens = 4096
+
+[contrastive]  # Montoya et al.'s non-coding eval/deploy contrasts, pinned
+repo = "ObscurumLight/eval-aware-qwen3.5-4b"
+revision = "ba727e2782d10b54390424674e85724252414c9e"
+samples = "datasets/contrastive_prompts_v2/samples.csv"
+splits = "datasets/contrastive_prompts_v2/splits.csv"
+
+[[models]]
+name = "before"
+path = "outputs/pilot/organism"
+exam = "outputs/pilot/exam-before/samples.jsonl"
+
+[[models]]
+name = "lam0-s0"
+path = "outputs/pilot/grpo-lam0-s0/merged"
+exam = "outputs/pilot/exam-lam0-s0/samples.jsonl"
+
+[[models]]
+name = "lam0-s1"
+path = "outputs/pilot/grpo-lam0-s1/merged"
+exam = "outputs/pilot/exam-lam0-s1/samples.jsonl"
+
+[[models]]
+name = "lam0-s2"
+path = "outputs/pilot/grpo-lam0-s2/merged"
+exam = "outputs/pilot/exam-lam0-s2/samples.jsonl"
+
+[[models]]
+name = "lam0.1-s0"
+path = "outputs/pilot/grpo-lam0.1-s0/merged"
+exam = "outputs/pilot/exam-lam0.1-s0/samples.jsonl"
+
+[[models]]
+name = "lam0.5-s0"
+path = "outputs/pilot/grpo-lam0.5-s0/merged"
+exam = "outputs/pilot/exam-lam0.5-s0/samples.jsonl"
+
+[[models]]
+name = "lam0.5-s1"
+path = "outputs/pilot/grpo-lam0.5-s1/merged"
+exam = "outputs/pilot/exam-lam0.5-s1/samples.jsonl"
+
+[[models]]
+name = "lam0.5-s2"
+path = "outputs/pilot/grpo-lam0.5-s2/merged"
+exam = "outputs/pilot/exam-lam0.5-s2/samples.jsonl"

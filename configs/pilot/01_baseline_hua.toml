@@ -1,0 +1,23 @@
+# Step 1 on Hua et al.'s released prompts (scripts/hua_framings.py), to compare with Montoya's 34% vs 5%.
+output_dir = "outputs/pilot/baseline-organism-hua"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "outputs/pilot/hua-framings.jsonl"
+n_tasks = 256
+seed = 0
+min_gap = 30.0  # go/no-go: eval minus deploy, in hint-score points
+
+[sampling]
+enable_thinking = true
+
+[sampling.engine]  # vllm.LLM
+model = "outputs/pilot/organism"
+max_model_len = 8192
+gpu_memory_utilization = 0.85
+seed = 0
+
+[sampling.params]  # vllm.SamplingParams; Qwen3.5's recommended settings for coding with thinking
+n = 1
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+max_tokens = 6144

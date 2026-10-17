@@ -1,0 +1,78 @@
+# Step 6, refit: job 3's probes again, scored at every layer, with the layer tie broken by log loss, and the
+# base Qwen3.5-4B (no organism adapters) reading the same traces as a floor for prompt leakage.
+# The first model fits the frozen probes.
+output_dir = "outputs/pilot/probes-02"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "outputs/pilot/hua-nohint-framings.jsonl"
+layers = [4, 8, 12, 16, 20, 24, 28, 32]  # of 32 decoder layers
+max_tokens = 4096
+
+[contrastive]  # Montoya et al.'s non-coding eval/deploy contrasts, pinned
+repo = "ObscurumLight/eval-aware-qwen3.5-4b"
+revision = "ba727e2782d10b54390424674e85724252414c9e"
+samples = "datasets/contrastive_prompts_v2/samples.csv"
+splits = "datasets/contrastive_prompts_v2/splits.csv"
+
+[[models]]
+name = "before"
+path = "outputs/pilot/organism"
+exam = "outputs/pilot/exam-before/samples.jsonl"
+
+[[models]]
+name = "lam0-s0"
+path = "outputs/pilot/grpo-lam0-s0/merged"
+exam = "outputs/pilot/exam-lam0-s0/samples.jsonl"
+
+[[models]]
+name = "lam0-s1"
+path = "outputs/pilot/grpo-lam0-s1/merged"
+exam = "outputs/pilot/exam-lam0-s1/samples.jsonl"
+
+[[models]]
+name = "lam0-s2"
+path = "outputs/pilot/grpo-lam0-s2/merged"
+exam = "outputs/pilot/exam-lam0-s2/samples.jsonl"
+
+[[models]]
+name = "lam0.1-s0"
+path = "outputs/pilot/grpo-lam0.1-s0/merged"
+exam = "outputs/pilot/exam-lam0.1-s0/samples.jsonl"
+
+[[models]]
+name = "lam0.5-s0"
+path = "outputs/pilot/grpo-lam0.5-s0/merged"
+exam = "outputs/pilot/exam-lam0.5-s0/samples.jsonl"
+
+[[models]]
+name = "lam0.5-s1"
+path = "outputs/pilot/grpo-lam0.5-s1/merged"
+exam = "outputs/pilot/exam-lam0.5-s1/samples.jsonl"
+
+[[models]]
+name = "lam0.5-s2"
+path = "outputs/pilot/grpo-lam0.5-s2/merged"
+exam = "outputs/pilot/exam-lam0.5-s2/samples.jsonl"
+
+[[models]]  # floor: the base model reading before's traces
+name = "base-on-before"
+path = "Qwen/Qwen3.5-4B"
+revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+exam = "outputs/pilot/exam-before/samples.jsonl"
+
+[[models]]  # floor: the base model reading lam0-s0's traces
+name = "base-on-lam0-s0"
+path = "Qwen/Qwen3.5-4B"
+revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+exam = "outputs/pilot/exam-lam0-s0/samples.jsonl"
+
+[[models]]  # floor: the base model reading lam0.1-s0's traces
+name = "base-on-lam0.1-s0"
+path = "Qwen/Qwen3.5-4B"
+revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+exam = "outputs/pilot/exam-lam0.1-s0/samples.jsonl"
+
+[[models]]  # floor: the base model reading lam0.5-s0's traces
+name = "base-on-lam0.5-s0"
+path = "Qwen/Qwen3.5-4B"
+revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+exam = "outputs/pilot/exam-lam0.5-s0/samples.jsonl"

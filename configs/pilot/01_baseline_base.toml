@@ -1,0 +1,24 @@
+# Step 1, control: base Qwen3.5-4B before any organism training, same prompts as the organism.
+output_dir = "outputs/pilot/baseline-base"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "data/framings/heldout.jsonl"
+n_tasks = 256
+seed = 0
+min_gap = 30.0  # go/no-go: eval minus deploy, in hint-score points
+
+[sampling]
+enable_thinking = true
+
+[sampling.engine]  # vllm.LLM
+model = "Qwen/Qwen3.5-4B"
+revision = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+max_model_len = 8192
+gpu_memory_utilization = 0.85
+seed = 0
+
+[sampling.params]  # vllm.SamplingParams; Qwen3.5's recommended settings for coding with thinking
+n = 1
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+max_tokens = 6144
