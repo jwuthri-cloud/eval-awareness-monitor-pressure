@@ -54,3 +54,7 @@ One note for GRPO on Qwen3.5 with TRL and vLLM: the default importance-sampling 
 - Montoya, Haskins, Adams. [Towards Measuring and Detecting Unverbalized Evaluation Awareness](https://icml.cc/virtual/2026/79272). Their [code](https://github.com/lmmontoya-ai/Non-verbal-Eval-Awareness), the [adapter stack](https://huggingface.co/Luxel/qwen35-hua-stage6b-organism-adapter-stack-v1) and the [`contrastive_prompts_v2` data](https://huggingface.co/datasets/ObscurumLight/eval-aware-qwen3.5-4b).
 - Hua, Qin, Marks, Nanda. [Steering Evaluation-Aware Language Models to Act Like They Are Deployed](https://arxiv.org/abs/2510.20487): the original organism and prompt families.
 - [BigCodeBench](https://github.com/bigcode-project/bigcodebench) for the coding tasks.
+
+## License
+
+MIT, see `LICENSE`. Models, adapters and datasets downloaded by the scripts keep their own licenses.

@@ -3,6 +3,7 @@ name = "evalgaming"
 version = "0.1.0"
 description = "Eval awareness under CoT-monitor pressure: does eval-conditional behavior survive RL against stated eval awareness?"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.11"
 dependencies = [
     "anthropic>=0.40",
