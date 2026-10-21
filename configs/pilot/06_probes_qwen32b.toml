@@ -1,0 +1,29 @@
+# Step 6 on Qwen3-32B (Arm A, first look): Montoya et al.'s contrastive probes fit on Qwen3-32B's own
+# activations, scored on its matched-cue exams (original pairs, seed 0; fresh pairs, seed 0) per
+# segment. Can the eval cue be read from its reasoning activations, also on silent traces? The
+# per-sample scores feed the probe-behavior analysis (does the probe track the tests-passed shift).
+# bf16 weights: the FP8 checkpoint that sampled the exams is a quantization of these.
+output_dir = "outputs/pilot/probes-qwen32b"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "data/framings/matched_cues.jsonl"
+layers = [8, 16, 24, 32, 40, 48, 56, 64]  # of 64 decoder layers
+max_tokens = 6400  # longest exam item is 6,326 tokens
+
+[contrastive]  # Montoya et al.'s non-coding eval/deploy contrasts, pinned
+repo = "ObscurumLight/eval-aware-qwen3.5-4b"
+revision = "ba727e2782d10b54390424674e85724252414c9e"
+samples = "datasets/contrastive_prompts_v2/samples.csv"
+splits = "datasets/contrastive_prompts_v2/splits.csv"
+
+[[models]]
+name = "original-pairs"
+path = "Qwen/Qwen3-32B"
+revision = "9216db5781bf21249d130ec9da846c4624c16137"
+exam = "outputs/pilot/exam-qwen32b-matched/samples.jsonl"
+
+[[models]]
+name = "fresh-pairs"
+path = "Qwen/Qwen3-32B"
+revision = "9216db5781bf21249d130ec9da846c4624c16137"
+exam = "outputs/pilot/exam-qwen32b-matched-heldout/samples.jsonl"
+framings = "data/framings/matched_cues_heldout.jsonl"

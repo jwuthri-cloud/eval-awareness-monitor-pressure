@@ -2,9 +2,16 @@
 
 Code for a small pilot: train an eval-aware model organism with RL against a chain-of-thought monitor that penalizes stated eval awareness, and check whether the eval-conditional behavior survives without the words.
 
-**Result, in short.** On Montoya et al.'s Qwen3.5-4B organism, the penalty removed the words, the eval-versus-deploy behavior gap and the probe readout together, on three seeds and at two penalty strengths. Before training, the organism's traces that do not state eval awareness already behave like deployment, so this is a result about word-coupled eval awareness. Write-up: [link].
+**Write-up: [I went looking for AI models that game their evals, and mostly came up empty](https://jwuthri-cloud.github.io/eval-awareness-monitor-pressure/).**
 
-| Model | Gap, eval − deploy (type-hint points) | Eval talk on eval prompts |
+**Results, in short.**
+
+- On Montoya et al.'s Qwen3.5-4B organism, the penalty removed the words, the eval-versus-deploy behavior gap and the probe readout together, on three seeds and at two penalty strengths. Before training, the organism's traces that do not state eval awareness already behave like deployment, so this is a result about word-coupled eval awareness.
+- Hua et al.'s Nemotron-49B organism, merged and run in FP8, shows a 50-point type-hint gap on Hua et al.'s prompts, 2.9 points on eval and deploy prompts written independently, and no gap on traces that do not state eval awareness. Base Nemotron shows no gap.
+- Ordinary models barely do it. With prompts that differ in one cue sentence, Qwen3-32B passes about 5 more unit tests per 100 when told it is evaluated (+5.0 [2.9, 7.0], two seeds pooled), without saying so. On 40 fresh cue pairs the effect is +2.5 [1.0, 4.0]. Base Nemotron-49B shows +0.9 [−0.2, 2.1].
+- A standard eval probe reads the cue sentence in Qwen3-32B's prompt (AUROC 0.92) but is near chance on the reasoning (0.51–0.59).
+
+| Model (Qwen3.5-4B organism) | Gap, eval − deploy (type-hint points) | Eval talk on eval prompts |
 | --- | --- | --- |
 | Before RL | 32.3 [28.4, 36.1] | 65% |
 | RL, no penalty (λ=0), 3 seeds | 17.2–23.8 | 41–64% |
@@ -18,8 +25,9 @@ Code for a small pilot: train an eval-aware model organism with RL against a cha
 | `src/evalgaming/` | Library: framings, type-hint scoring, the monitor (LLM judge + regex), sampling with vLLM, rewards, sandboxed unit tests, probes, statistics |
 | `experiments/pilot/` | One script per step, each driven by a TOML config; `run_*.sh` chain the steps for one GPU job |
 | `configs/pilot/` | The configs for every run reported |
-| `data/` | Our eval/deploy framings (550 train, 150 held out), the monitor's prompt and rubric, probe and steering contrasts. Contract in `data/SPEC.md` |
-| `scripts/` | Data validation, the cue audit, building Hua et al.'s prompt framings, merging adapters |
+| `data/` | Eval/deploy framings (550 train, 150 held out), the matched cue pairs for the natural-model tests, the monitor's prompt and rubric, probe and steering contrasts. Contract in `data/SPEC.md` |
+| `scripts/` | Data validation, the cue audit, building Hua et al.'s prompt framings, merging adapters (`merge_adapter.py`, and `merge_lora.py` for models too big to load whole) |
+| `docs/` | The write-up, served as a GitHub Pages site |
 | `tests/` | CPU-only unit tests |
 
 ## Setup
@@ -44,6 +52,13 @@ Each step runs as `uv run python experiments/pilot/<step>.py --config configs/pi
 6. `03b_judge_runs.py`: the monitor, or a held-out judge, over exam traces.
 7. `06_probes.py`: eval-vs-deploy probes on every model at every layer, with the base model reading the same traces as a floor.
 8. `07_ei_sample.py` and `07_ei_train.py`: expert iteration toward a less narrow organism.
+
+The bigger-model follow-ups use the same exam and judge steps:
+
+9. `run_nemotron.sh`, `run_nemotron_base.sh`, `run_nemotron_identity.sh`: Hua et al.'s Nemotron-49B organism (LoRA merged with `scripts/merge_lora.py`) and the base model, on one H100 each, FP8.
+10. `run_qwen32b.sh`, then `run_qwen32b_matched.sh` and `run_matched_check.sh <config>`: Qwen3-32B and Nemotron-49B with matched cue pairs (`data/framings/matched_cues*.jsonl`).
+11. `08_compare_exams.py`, `09_behavior_screen.py`, `10_matched_checks.py`: compare exams across models, screen behaviors beyond type hints (unit tests passed, docstrings, length), and test eval-minus-deploy gaps paired by task, with pools of runs.
+12. `run_probes_qwen32b.sh` and `11_probe_behavior.py`: probes on Qwen3-32B and their link to the behavior gap per cue pair.
 
 `experiments/pilot/run_job3.sh` runs steps 1–5 and 7 for every seed and penalty on one H100 (about 12 hours). The `run_*.sh` scripts are written for a rented GPU machine: they source `.env` and shut the machine down 20–45 minutes after they end.
 

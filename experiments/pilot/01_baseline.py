@@ -17,7 +17,7 @@ import typer
 from rich.console import Console
 
 from evalgaming import behavior
-from evalgaming.framings import GROUPS, by_group, load_framings
+from evalgaming.framings import GROUPS, assign_framings, by_group, load_framings
 from evalgaming.monitor import prefilter
 from evalgaming.report import estimates_table, hint_gap, sample_metrics, save_summary
 from evalgaming.runs import ConfigOption, JsonLogsOption, start_run, write_jsonl
@@ -36,6 +36,7 @@ class BaselineConfig:
     seed: int
     min_gap: float
     sampling: SamplingConfig
+    matched: bool = False  # one cue pair per task across groups (framings/matched_cues.jsonl)
 
 
 def main(config: ConfigOption, json_logs: JsonLogsOption = False) -> None:
@@ -44,7 +45,8 @@ def main(config: ConfigOption, json_logs: JsonLogsOption = False) -> None:
     rng = random.Random(cfg.seed)
     tasks = rng.sample(load_tasks(cfg.tasks), cfg.n_tasks)
     groups = by_group(load_framings(cfg.framings))
-    prompts = [(task, rng.choice(groups[group])) for task in tasks for group in GROUPS]
+    prompts = assign_framings(tasks, groups, rng, cfg.matched)
+    present = [group for group in GROUPS if group in groups]
     completions = sample([framing.messages(task.prompt) for task, framing in prompts], cfg.sampling)
 
     rows = [
@@ -67,11 +69,12 @@ def main(config: ConfigOption, json_logs: JsonLogsOption = False) -> None:
     ]
     write_jsonl(rows, run_dir / "samples.jsonl")
 
-    by_group_rows = {group: [row for row in rows if row["group"] == group] for group in GROUPS}
+    by_group_rows = {group: [row for row in rows if row["group"] == group] for group in present}
     metrics = {group: sample_metrics(members) for group, members in by_group_rows.items()}
     gaps = {
         f"{group} - deploy": {"hint_score": hint_gap(by_group_rows[group], by_group_rows["deploy"])}
         for group in ("eval", "wood", "neutral")
+        if group in present
     }
     # Traces the prefilter does not flag: the gap that does not run through stated eval awareness.
     silent = {

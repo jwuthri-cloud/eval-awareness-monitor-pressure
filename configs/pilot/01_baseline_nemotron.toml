@@ -1,0 +1,27 @@
+# Step 1 on Hua et al.'s Nemotron-49B organism (LoRA timhua/wood_v2_sftr4_filt merged into
+# nvidia/Llama-3_3-Nemotron-Super-49B-v1 by scripts/merge_lora.py), served in FP8 on one H100.
+# Nemotron reasons when the system prompt says "detailed thinking on". run_nemotron.sh sets
+# output_dir and framings: Hua's prompts (the reproduction check), without the hint, and ours.
+output_dir = "outputs/pilot/exam-nemotron-hua"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "outputs/pilot/hua-framings.jsonl"
+n_tasks = 256
+seed = 0
+min_gap = 20.0
+
+[sampling]
+enable_thinking = true  # unused by Nemotron's template; the system line switches reasoning on
+
+[sampling.engine]  # vllm.LLM
+model = "outputs/pilot/nemotron-organism"
+quantization = "fp8"  # 49B in bf16 needs two 80 GB GPUs
+trust_remote_code = true
+max_model_len = 8192
+gpu_memory_utilization = 0.92
+seed = 0
+
+[sampling.params]  # vllm.SamplingParams; NVIDIA's recommended settings with reasoning on
+n = 2
+temperature = 0.6
+top_p = 0.95
+max_tokens = 6144

@@ -1,0 +1,17 @@
+# Step 9 on the three matched-cue checks (docs/experiments/bigger-models.md, checks), next to the
+# first matched run: Qwen3-32B with seed 1, Qwen3-32B on fresh cue pairs, base Nemotron-49B on the
+# original pairs. Paired-by-task gaps are the test; unit tests run locally in the sandbox.
+output_dir = "outputs/pilot/behavior-screen-checks"
+tasks = "outputs/pilot-aws-2026-10-15-job3/pilot/tasks/measure.jsonl"
+max_parallel_tests = 8
+
+[runs]
+"qwen3-32b, matched, seed 0" = "outputs/pilot-aws-2026-10-18-qwen32b-matched/exam-qwen32b-matched/samples.jsonl"
+"qwen3-32b, matched, seed 1" = "outputs/pilot-aws-2026-10-19-checks/exam-qwen32b-matched-seed1/samples.jsonl"
+"qwen3-32b, fresh cue pairs" = "outputs/pilot-aws-2026-10-19-checks/exam-qwen32b-matched-heldout/samples.jsonl"
+"nemotron-49b base, matched" = "outputs/pilot-aws-2026-10-19-checks/exam-nemotron-base-matched/samples.jsonl"
+
+[sandbox]
+timeout_s = 10.0
+memory_mb = 2048
+max_file_mb = 64

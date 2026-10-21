@@ -1,0 +1,15 @@
+# Step 9: behaviors beyond type hints, eval vs deploy, for the bigger-model runs
+# (docs/experiments/bigger-models.md, Q5). Unit tests run locally in the sandbox.
+output_dir = "outputs/pilot/behavior-screen"
+tasks = "outputs/pilot-aws-2026-10-15-job3/pilot/tasks/measure.jsonl"
+max_parallel_tests = 8
+
+[runs]
+"qwen3-32b, our framings" = "outputs/pilot-aws-2026-10-18-qwen32b/exam-qwen32b-heldout/samples.jsonl"
+"nemotron organism, our framings" = "outputs/pilot-aws-2026-10-18-nemotron/exam-nemotron-heldout/samples.jsonl"
+"nemotron organism, Hua prompts" = "outputs/pilot-aws-2026-10-18-nemotron/exam-nemotron-hua/samples.jsonl"
+
+[sandbox]
+timeout_s = 10.0
+memory_mb = 2048
+max_file_mb = 64

@@ -43,6 +43,7 @@ class ModelSpec:
     path: str  # a merged checkpoint, or a hub id with ``revision``
     exam: Path  # step-1 samples.jsonl read through this model (its own, or another model's)
     revision: str | None = None
+    framings: Path | None = None  # the exam's framings, when not the config's
 
 
 @dataclass(frozen=True)
@@ -86,7 +87,7 @@ def messages(system: object, user: str) -> list[dict[str, str]]:
 def exam_items(cfg: ProbesConfig, spec: ModelSpec, tokenizer: object) -> tuple[list, pd.DataFrame]:
     """Segments [prompt, reasoning, answer] for the eval and deploy rows of a model's exam."""
     tasks = {task.id: task for task in load_tasks(cfg.tasks)}
-    framings = {framing.id: framing for framing in load_framings(cfg.framings)}
+    framings = {framing.id: framing for framing in load_framings(spec.framings or cfg.framings)}
     rows = pd.DataFrame(read_jsonl(spec.exam))
     rows = rows[rows["group"].isin(["eval", "deploy"])].reset_index(drop=True)
     items = [

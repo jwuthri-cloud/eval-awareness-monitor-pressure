@@ -1,0 +1,29 @@
+# Step 8: the bigger-model comparison (docs/experiments/bigger-models.md). Paths are where the
+# copied results land locally; runs not copied yet are listed as missing.
+output_dir = "outputs/pilot/compare-bigger-models"
+comparisons = [
+    ["nemotron organism, Hua prompts", "nemotron base, Hua prompts"],
+    ["nemotron organism, Hua prompts, no hint", "nemotron base, Hua prompts, no hint"],
+    ["nemotron organism, our framings", "nemotron base, our framings"],
+    ["nemotron organism, Hua prompts", "nemotron organism, our framings"],
+    ["nemotron organism, our framings + identity", "nemotron base, our framings + identity"],
+    ["nemotron organism, Hua prompts", "nemotron organism, our framings + identity"],
+    ["qwen3.5-4b organism, Hua prompts, no hint", "qwen3.5-4b organism, our framings"],
+]
+
+[runs]
+"nemotron organism, Hua prompts" = "outputs/pilot-aws-2026-10-18-nemotron/exam-nemotron-hua/samples.jsonl"
+"nemotron organism, Hua prompts, no hint" = "outputs/pilot-aws-2026-10-18-nemotron/exam-nemotron-hua-nohint/samples.jsonl"
+"nemotron organism, our framings" = "outputs/pilot-aws-2026-10-18-nemotron/exam-nemotron-heldout/samples.jsonl"
+"nemotron base, Hua prompts" = "outputs/pilot-aws-2026-10-18-nemotron/exam-nemotron-base-hua/samples.jsonl"
+"nemotron base, Hua prompts, no hint" = "outputs/pilot-aws-2026-10-18-nemotron/exam-nemotron-base-hua-nohint/samples.jsonl"
+"nemotron base, our framings" = "outputs/pilot-aws-2026-10-18-nemotron/exam-nemotron-base-heldout/samples.jsonl"
+"nemotron organism, our framings + identity" = "outputs/pilot-aws-2026-10-18-nemotron/exam-nemotron-heldout-identity/samples.jsonl"
+"nemotron base, our framings + identity" = "outputs/pilot-aws-2026-10-18-nemotron/exam-nemotron-base-heldout-identity/samples.jsonl"
+"qwen3-32b, our framings" = "outputs/pilot-aws-2026-10-18-qwen32b/exam-qwen32b-heldout/samples.jsonl"
+"qwen3.5-4b organism, Hua prompts, no hint" = "outputs/pilot-aws-2026-10-15-job3/pilot/exam-before/samples.jsonl"
+"qwen3.5-4b organism, our framings" = "outputs/pilot-aws-2026-10-16-organism/pilot/exam-heldout-before/samples.jsonl"
+
+[verdicts]  # Haiku (the training monitor) over eval and deploy traces, 03b_judge_runs
+"nemotron organism, Hua prompts" = "outputs/pilot/judge-runs-nemotron/verdicts-hua.jsonl"
+"nemotron organism, our framings" = "outputs/pilot/judge-runs-nemotron/verdicts-heldout.jsonl"

@@ -1,0 +1,29 @@
+# Step 1 on base Llama-3.3-Nemotron-Super-49B-v1 WITHOUT Hua et al.'s organism LoRA: the control for
+# 01_baseline_nemotron.toml. Same exams, FP8, sampling and seed; only the weights differ, so any gap
+# here is natural to Nemotron and the organism's extra gap is what Hua's training added.
+# run_nemotron_base.sh sets output_dir and framings.
+output_dir = "outputs/pilot/exam-nemotron-base-hua"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "outputs/pilot/hua-framings.jsonl"
+n_tasks = 256
+seed = 0
+min_gap = 20.0
+
+[sampling]
+enable_thinking = true  # unused by Nemotron's template; the system line switches reasoning on
+
+[sampling.engine]  # vllm.LLM
+model = "nvidia/Llama-3_3-Nemotron-Super-49B-v1"
+revision = "387156d8d6868c19f3472fa607aa9bfc4f662333"
+tokenizer_revision = "387156d8d6868c19f3472fa607aa9bfc4f662333"
+quantization = "fp8"
+trust_remote_code = true
+max_model_len = 8192
+gpu_memory_utilization = 0.92
+seed = 0
+
+[sampling.params]  # vllm.SamplingParams; identical to the organism's
+n = 2
+temperature = 0.6
+top_p = 0.95
+max_tokens = 6144

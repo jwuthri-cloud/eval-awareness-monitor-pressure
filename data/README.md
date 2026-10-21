@@ -1,7 +1,7 @@
 # Data
 
 Every file here follows the contract in [`SPEC.md`](SPEC.md) and is checked by `uv run python scripts/validate_data.py`.
-Files are frozen once an experiment has used them. To change one, add a new version and say why in the commit.
+Files are frozen once an experiment has used them. To change one, add a new version and record why in the [research journal](../docs/journal/).
 
 ## Inventory
 
@@ -26,3 +26,9 @@ Files are frozen once an experiment has used them. To change one, add a new vers
 | [Montoya et al. data](https://huggingface.co/datasets/ObscurumLight/eval-aware-qwen3.5-4b) | Pilot coding prompts, train-style probe contrasts, Qwen rewrite of the organism training documents |
 | [Hua et al. documents](https://huggingface.co/datasets/timhua/second_half_training) and [expert iteration data](https://huggingface.co/datasets/timhua/expert_iter_2) | Reference for building the Qwen3-8B organism |
 | BigCodeBench and stdlib-only coding tasks | Coding tasks wrapped by the framings |
+
+## Still to build later in the project
+
+- `monitor/labels.jsonl`: about 300 hand-labelled reasoning traces from the pilot organism, later extended with traces from the Arm A RL runs. No synthetic traces: generating them was stopped by model safety classifiers, and we do not route around them.
+- Training data for the Qwen3-8B natural language autoencoder, about 500k pairs, generated during the fellowship with the released recipe.
+- Arm B gaming data, generated programmatically from the concepts and steering pairs.

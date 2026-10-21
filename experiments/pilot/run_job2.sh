@@ -4,9 +4,9 @@
 # down 45 minutes after the script ends, success or failure, so it never idles for long.
 set -euo pipefail
 trap 'echo "=== $(date -u +%H:%M:%S) exit $?"; sudo shutdown -h +45' EXIT
-cd "$(dirname "$0")/../.."
+cd ~/EvalGamingUnderPressureTraining
 set -a; source .env; set +a
-export HF_HOME=${HF_HOME:-$HOME/hf} PATH=$HOME/.local/bin:$PATH
+export HF_HOME=/home/ubuntu/hf PATH=$HOME/.local/bin:$PATH
 run() { echo "=== $(date -u +%H:%M:%S) $*"; uv run python "$@" --json-logs; }
 run experiments/pilot/00_tasks.py --config configs/pilot/00_tasks.toml
 run experiments/pilot/00_organism.py --config configs/pilot/00_organism.toml

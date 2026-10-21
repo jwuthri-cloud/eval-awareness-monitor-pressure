@@ -52,3 +52,22 @@ def test_groups_split_wood_from_eval():
         "deploy": ["fr-test-0003"],
         "neutral": ["fr-test-0004"],
     }
+
+
+def test_assign_framings_matched_uses_one_pair_per_task():
+    import random
+
+    from evalgaming.framings import Framing, assign_framings
+
+    def framing(pair: int, context: str, label: str) -> Framing:
+        return Framing(f"{label}-{pair}", context, label, f"pair-{pair}", f"cue {pair}", "{task}")
+
+    groups = {
+        "eval": [framing(i, "eval_explicit", "eval") for i in range(5)],
+        "deploy": [framing(i, "deploy_explicit", "deploy") for i in range(5)],
+    }
+    pairs = assign_framings(["t0", "t1", "t2"], groups, random.Random(0), matched=True)
+    assert [task for task, _ in pairs] == ["t0", "t0", "t1", "t1", "t2", "t2"]
+    for k in range(0, 6, 2):
+        assert pairs[k][1].style == pairs[k + 1][1].style  # same cue pair for eval and deploy
+        assert {pairs[k][1].label, pairs[k + 1][1].label} == {"eval", "deploy"}

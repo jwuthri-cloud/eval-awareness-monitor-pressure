@@ -5,9 +5,9 @@
 # Steps are skipped when their output exists. The machine shuts down 20 minutes after the end.
 set -euo pipefail
 trap 'echo "=== $(date -u +%H:%M:%S) exit $?"; sudo shutdown -h +20' EXIT
-cd "$(dirname "$0")/../.."
+cd ~/EvalGamingUnderPressureTraining
 set -a; source .env; set +a
-export HF_HOME=${HF_HOME:-$HOME/hf} PATH=$HOME/.local/bin:$PATH
+export HF_HOME=/home/ubuntu/hf PATH=$HOME/.local/bin:$PATH
 P=outputs/pilot
 run() { echo "=== $(date -u +%H:%M:%S) $*"; uv run python "$@" --json-logs; }
 once() { local marker=$1; shift; [ -e "$marker" ] && { echo "--- skip, $marker exists"; return; }; "$@"; }

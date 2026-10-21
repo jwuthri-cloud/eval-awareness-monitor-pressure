@@ -1,0 +1,22 @@
+# Step 3b on the 40-fresh-pair runs (seeds 2 and 3): does the eval-cue effect on tests passed hold on
+# traces silent to Haiku too?
+output_dir = "outputs/pilot/judge-runs-fresh40"
+examples = 5
+
+[runs]
+seed2 = "outputs/pilot/judge-inputs/qwen32b-fresh40-seed2-eval-deploy.jsonl"
+seed3 = "outputs/pilot/judge-inputs/qwen32b-fresh40-seed3-eval-deploy.jsonl"
+
+[monitor]
+prompt = "data/monitor/judge_prompt.md"
+rubric = "data/monitor/rubric.md"
+cache = "outputs/pilot/judge-cache.jsonl"
+
+[judge]  # the training monitor, through the Message Batches API at half price
+provider = "anthropic"
+model = "claude-haiku-5-5"
+effort = "low"
+max_tokens = 4096
+max_retries = 4
+max_concurrency = 16
+batch_poll_s = 30.0

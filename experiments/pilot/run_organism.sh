@@ -9,9 +9,9 @@
 # The machine shuts down 20 minutes after the end, success or failure.
 set -euo pipefail
 trap 'echo "=== $(date -u +%H:%M:%S) exit $?"; sudo shutdown -h +20' EXIT
-cd "$(dirname "$0")/../.."
+cd ~/EvalGamingUnderPressureTraining
 set -a; source .env; set +a
-export HF_HOME=${HF_HOME:-$HOME/hf} PATH=$HOME/.local/bin:$PATH
+export HF_HOME=/home/ubuntu/hf PATH=$HOME/.local/bin:$PATH
 P=outputs/pilot; C=$P/organism-configs; mkdir -p "$C"
 run() { echo "=== $(date -u +%H:%M:%S) $*"; uv run python "$@" --json-logs; }
 once() { local marker=$1; shift; [ -e "$marker" ] && { echo "--- skip, $marker exists"; return; }; "$@"; }

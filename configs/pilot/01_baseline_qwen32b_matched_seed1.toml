@@ -1,0 +1,28 @@
+# Check 1 of the matched-cue follow-up: the same run as 01_baseline_qwen32b_matched.toml with seed 1
+# (a new draw of which cue pair each task gets, and new samples). Does the eval-cue effect on tests
+# passed replicate?
+output_dir = "outputs/pilot/exam-qwen32b-matched-seed1"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "data/framings/matched_cues.jsonl"
+n_tasks = 256
+seed = 1
+min_gap = 20.0
+matched = true
+
+[sampling]
+enable_thinking = true
+
+[sampling.engine]  # vllm.LLM
+model = "Qwen/Qwen3-32B-FP8"
+revision = "aa55da1ecc13d006e8b8e4f54579b1ea8c3db2df"
+tokenizer_revision = "aa55da1ecc13d006e8b8e4f54579b1ea8c3db2df"
+max_model_len = 8192
+gpu_memory_utilization = 0.92
+seed = 1
+
+[sampling.params]  # vllm.SamplingParams; Qwen3's recommended settings with thinking
+n = 4
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+max_tokens = 6144

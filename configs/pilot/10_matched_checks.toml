@@ -1,0 +1,31 @@
+# Step 10: tests passed under matched cue pairs, with the checks (docs/experiments/bigger-models.md,
+# checks): the first Qwen3-32B run, its seed-1 replication, fresh cue pairs (20 pairs, then 40 pairs
+# with seeds 2 and 3), base Nemotron-49B, and pools of the Qwen3-32B runs by cue set.
+output_dir = "outputs/pilot/matched-checks"
+tasks = "outputs/pilot-aws-2026-10-15-job3/pilot/tasks/measure.jsonl"
+max_parallel_tests = 8
+
+[runs]
+"qwen3-32b, matched, seed 0" = "outputs/pilot-aws-2026-10-18-qwen32b-matched/exam-qwen32b-matched/samples.jsonl"
+"qwen3-32b, matched, seed 1" = "outputs/pilot-aws-2026-10-19-checks/exam-qwen32b-matched-seed1/samples.jsonl"
+"qwen3-32b, fresh cue pairs" = "outputs/pilot-aws-2026-10-19-checks/exam-qwen32b-matched-heldout/samples.jsonl"
+"nemotron-49b base, matched" = "outputs/pilot-aws-2026-10-19-checks/exam-nemotron-base-matched/samples.jsonl"
+"qwen3-32b, 40 fresh pairs, seed 2" = "outputs/pilot-aws-2026-10-19-fresh40/exam-qwen32b-fresh40-seed2/samples.jsonl"
+"qwen3-32b, 40 fresh pairs, seed 3" = "outputs/pilot-aws-2026-10-19-fresh40/exam-qwen32b-fresh40-seed3/samples.jsonl"
+
+[verdicts]  # Haiku (the training monitor) over eval and deploy traces, 03b_judge_runs
+"qwen3-32b, matched, seed 0" = "outputs/pilot/judge-runs-qwen32b-matched/verdicts-matched.jsonl"
+"qwen3-32b, matched, seed 1" = "outputs/pilot/judge-runs-checks/verdicts-seed1.jsonl"
+"qwen3-32b, fresh cue pairs" = "outputs/pilot/judge-runs-checks/verdicts-fresh.jsonl"
+"nemotron-49b base, matched" = "outputs/pilot/judge-runs-checks/verdicts-nemotron.jsonl"
+"qwen3-32b, 40 fresh pairs, seed 2" = "outputs/pilot/judge-runs-fresh40/verdicts-seed2.jsonl"
+"qwen3-32b, 40 fresh pairs, seed 3" = "outputs/pilot/judge-runs-fresh40/verdicts-seed3.jsonl"
+
+[pools]  # runs counted together, paired by task
+"qwen3-32b, original pairs, pooled" = ["qwen3-32b, matched, seed 0", "qwen3-32b, matched, seed 1"]
+"qwen3-32b, fresh pairs, pooled" = ["qwen3-32b, fresh cue pairs", "qwen3-32b, 40 fresh pairs, seed 2", "qwen3-32b, 40 fresh pairs, seed 3"]
+
+[sandbox]
+timeout_s = 10.0
+memory_mb = 2048
+max_file_mb = 64

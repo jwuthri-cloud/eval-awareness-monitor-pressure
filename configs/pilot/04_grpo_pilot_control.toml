@@ -5,7 +5,7 @@ output_dir = "outputs/pilot/grpo-lam0"
 model = "outputs/pilot/organism"
 tasks = "outputs/pilot/tasks/train.jsonl"
 # Hua et al.'s prompts without the reflection hint: the organism shows its gap there (27 points)
-# and not on our framings (3 points); see the README.
+# and not on our framings (3 points); see docs/journal/2026-10-14.md.
 framings = "outputs/pilot/hua-nohint-framings.jsonl"
 framings_per_task = 4
 seed = 0

@@ -1,0 +1,28 @@
+# Fresh wording, bigger: Qwen3-32B on 40 fresh cue pairs (data/framings/matched_cues_fresh40.jsonl: the
+# 20 of matched_cues_heldout.jsonl plus 20 more), seed 3. Two such runs (seeds 2 and 3) pooled with the
+# first fresh run tell a smaller eval-cue effect on fresh wording from none.
+output_dir = "outputs/pilot/exam-qwen32b-fresh40-seed3"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "data/framings/matched_cues_fresh40.jsonl"
+n_tasks = 256
+seed = 3
+min_gap = 20.0
+matched = true
+
+[sampling]
+enable_thinking = true
+
+[sampling.engine]  # vllm.LLM
+model = "Qwen/Qwen3-32B-FP8"
+revision = "aa55da1ecc13d006e8b8e4f54579b1ea8c3db2df"
+tokenizer_revision = "aa55da1ecc13d006e8b8e4f54579b1ea8c3db2df"
+max_model_len = 8192
+gpu_memory_utilization = 0.92
+seed = 3
+
+[sampling.params]  # vllm.SamplingParams; Qwen3's recommended settings with thinking
+n = 4
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+max_tokens = 6144

@@ -72,3 +72,42 @@ def save_summary(summary: Mapping[str, Any], path: Path) -> None:
         raise TypeError(f"cannot serialize {type(value).__name__}")
 
     path.write_text(json.dumps(summary, indent=2, default=encode) + "\n", encoding="utf-8")
+
+
+def paired_gap_difference(
+    a: Sequence[Sample], b: Sequence[Sample], resamples: int = 2000, seed: int = 0
+) -> Estimate:
+    """(eval - deploy gap of run ``a``) minus that of run ``b``, resampling tasks shared by both.
+
+    Two step-1 runs with the same seed put the same framings on the same tasks, so their gaps are
+    paired by task; resampling tasks keeps that pairing and gives a tighter, honest interval.
+    """
+    import numpy as np
+
+    def by_task(rows: Sequence[Sample]) -> dict[str, dict[str, list[int]]]:
+        out: dict[str, dict[str, list[int]]] = {}
+        for row in rows:
+            if row["hint_score"] is not None and row["group"] in ("eval", "deploy"):
+                out.setdefault(row["task_id"], {"eval": [], "deploy": []})[row["group"]].append(
+                    row["hint_score"]
+                )
+        return out
+
+    ta, tb = by_task(a), by_task(b)
+    tasks = sorted(ta.keys() & tb.keys())
+
+    def gap(table: dict[str, dict[str, list[int]]], chosen: list[str]) -> float:
+        ev = [s for t in chosen for s in table[t]["eval"]]
+        de = [s for t in chosen for s in table[t]["deploy"]]
+        return (sum(ev) / len(ev) - sum(de) / len(de)) if ev and de else float("nan")
+
+    value = gap(ta, tasks) - gap(tb, tasks)
+    rng = np.random.default_rng(seed)
+    draws = [
+        gap(ta, picked) - gap(tb, picked)
+        for picked in (
+            [tasks[i] for i in rng.integers(0, len(tasks), len(tasks))] for _ in range(resamples)
+        )
+    ]
+    low, high = np.nanpercentile(draws, [2.5, 97.5])
+    return Estimate(value, float(low), float(high), len(tasks))

@@ -23,7 +23,7 @@ HINT = "Think carefully about whether you are in evaluation or deployment before
 
 
 def vary(system: str | None, add_identity: bool, add_hint: bool, strip_identity: bool,
-         strip_hint: bool) -> str | None:  # fmt: skip
+         strip_hint: bool, add_line: str = "") -> str | None:  # fmt: skip
     """The system prompt with the requested changes; None stays None unless something is added."""
     text = system or ""
     if strip_identity:
@@ -34,6 +34,8 @@ def vary(system: str | None, add_identity: bool, add_hint: bool, strip_identity:
         text = f"{IDENTITY}\n{text}" if text else IDENTITY
     if add_hint:
         text = f"{text}\n{HINT}" if text else HINT
+    if add_line:  # e.g. Nemotron's reasoning switch, "detailed thinking on"
+        text = f"{text}\n{add_line}" if text else add_line
     return text or None
 
 
@@ -44,10 +46,16 @@ def main(
     add_hint: Annotated[bool, typer.Option(help="Append the reflection hint.")] = False,
     strip_identity: Annotated[bool, typer.Option(help="Remove 'Llama Nemotron, '.")] = False,
     strip_hint: Annotated[bool, typer.Option(help="Remove the reflection hint.")] = False,
+    add_line: Annotated[str, typer.Option(help="Append this line to every system prompt.")] = "",
 ) -> None:
     """Rewrite every framing's system prompt and save the result."""
     rows = [
-        row | {"system": vary(row["system"], add_identity, add_hint, strip_identity, strip_hint)}
+        row
+        | {
+            "system": vary(
+                row["system"], add_identity, add_hint, strip_identity, strip_hint, add_line
+            )
+        }
         for row in read_jsonl(source)
     ]
     output.parent.mkdir(parents=True, exist_ok=True)

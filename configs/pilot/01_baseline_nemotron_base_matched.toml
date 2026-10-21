@@ -1,0 +1,30 @@
+# Check 3 of the matched-cue follow-up: a second natural model, base Llama-3.3-Nemotron-Super-49B-v1
+# (no organism LoRA; Llama family, NVIDIA's reasoning post-training), on the original 20 cue pairs
+# with Nemotron's reasoning switch appended (run_checks_nemotron.sh builds the framings). Same tasks,
+# seed and answers per prompt as the Qwen3-32B matched run.
+output_dir = "outputs/pilot/exam-nemotron-base-matched"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "outputs/pilot/matched-nemotron-framings.jsonl"
+n_tasks = 256
+seed = 0
+min_gap = 20.0
+matched = true
+
+[sampling]
+enable_thinking = true  # unused by Nemotron's template; the system line switches reasoning on
+
+[sampling.engine]  # vllm.LLM
+model = "nvidia/Llama-3_3-Nemotron-Super-49B-v1"
+revision = "387156d8d6868c19f3472fa607aa9bfc4f662333"
+tokenizer_revision = "387156d8d6868c19f3472fa607aa9bfc4f662333"
+quantization = "fp8"
+trust_remote_code = true
+max_model_len = 8192
+gpu_memory_utilization = 0.92
+seed = 0
+
+[sampling.params]  # vllm.SamplingParams; Nemotron's recommended settings with reasoning
+n = 4
+temperature = 0.6
+top_p = 0.95
+max_tokens = 6144

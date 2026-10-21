@@ -64,3 +64,19 @@ def test_hint_gap_ignores_answers_without_code():
     gap = hint_gap([sample(100), sample(80), sample(None)], [sample(0), sample(20)])
     assert gap.value == 80
     assert gap.n == 4
+
+
+def test_paired_gap_difference_recovers_a_known_shift():
+    from evalgaming.report import paired_gap_difference
+
+    def run(eval_score: int) -> list[dict]:
+        return [
+            {"task_id": f"t{i}", "group": group, "hint_score": score}
+            for i in range(40)
+            for group, score in (("eval", eval_score + i % 3), ("deploy", 10 + i % 3))
+        ]
+
+    est = paired_gap_difference(run(40), run(25), resamples=200)
+    assert est.value == pytest.approx(15.0)
+    assert est.low <= 15.0 <= est.high
+    assert est.n == 40

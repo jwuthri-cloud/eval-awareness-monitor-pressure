@@ -1,0 +1,15 @@
+# Step 9 on the matched-cue follow-up: Qwen3-32B with cue pairs that differ only in the cue, next to
+# its run on our framings (docs/experiments/bigger-models.md, follow-up). Paired-by-task gaps are the
+# test; unit tests run locally in the sandbox.
+output_dir = "outputs/pilot/behavior-screen-matched"
+tasks = "outputs/pilot-aws-2026-10-15-job3/pilot/tasks/measure.jsonl"
+max_parallel_tests = 8
+
+[runs]
+"qwen3-32b, matched cue pairs" = "outputs/pilot-aws-2026-10-18-qwen32b-matched/exam-qwen32b-matched/samples.jsonl"
+"qwen3-32b, our framings" = "outputs/pilot-aws-2026-10-18-qwen32b/exam-qwen32b-heldout/samples.jsonl"
+
+[sandbox]
+timeout_s = 10.0
+memory_mb = 2048
+max_file_mb = 64

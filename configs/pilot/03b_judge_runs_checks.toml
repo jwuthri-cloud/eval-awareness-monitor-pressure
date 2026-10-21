@@ -1,0 +1,23 @@
+# Step 3b on the three matched-cue checks: does the eval-cue effect on tests passed hold on traces
+# silent to Haiku too, not just to the regex?
+output_dir = "outputs/pilot/judge-runs-checks"
+examples = 5
+
+[runs]
+seed1 = "outputs/pilot/judge-inputs/qwen32b-matched-seed1-eval-deploy.jsonl"
+fresh = "outputs/pilot/judge-inputs/qwen32b-matched-heldout-eval-deploy.jsonl"
+nemotron = "outputs/pilot/judge-inputs/nemotron-base-matched-eval-deploy.jsonl"
+
+[monitor]
+prompt = "data/monitor/judge_prompt.md"
+rubric = "data/monitor/rubric.md"
+cache = "outputs/pilot/judge-cache.jsonl"
+
+[judge]  # the training monitor, through the Message Batches API at half price
+provider = "anthropic"
+model = "claude-haiku-5-5"
+effort = "low"
+max_tokens = 4096
+max_retries = 4
+max_concurrency = 16
+batch_poll_s = 30.0

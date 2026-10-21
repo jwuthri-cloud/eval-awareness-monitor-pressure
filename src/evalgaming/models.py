@@ -79,3 +79,57 @@ def load_organism(config: OrganismConfig) -> tuple[Any, Any]:
 def decoder_layers(model: Any) -> Any:
     """The decoder blocks whose outputs form the residual stream (``model.model.layers``)."""
     return model.model.layers
+
+
+def lora_pairs(adapter: dict[str, Any]) -> dict[str, tuple[Any, Any]]:
+    """The (A, B) factors of every LoRA pair in a PEFT adapter state dict, keyed by base weight.
+
+    Keys ``base_model.model.<module>.lora_A.weight`` (and ``lora_B``) map to ``<module>.weight``.
+    Full deltas are built one at a time while merging: all at once they would not fit in memory.
+    """
+    return {
+        key.removeprefix("base_model.model.").replace(".lora_A.weight", ".weight"): (
+            a,
+            adapter[key.replace(".lora_A.", ".lora_B.")],
+        )
+        for key, a in adapter.items()
+        if ".lora_A." in key
+    }
+
+
+def merge_lora_shards(base_dir: Path, adapter_dir: Path, output_dir: Path) -> int:
+    """Merge a plain LoRA adapter into a safetensors checkpoint one shard at a time; return merges.
+
+    Works for architectures whose modeling code ``transformers`` cannot load (vLLM serves the
+    result): only weight tensors are touched, every other file is copied. Refuses DoRA, rsLoRA and
+    adapters with extra saved modules, and checks that every adapter pair found its weight.
+    """
+    import shutil
+
+    import torch
+    from safetensors.torch import load_file, save_file
+
+    config = json.loads((adapter_dir / "adapter_config.json").read_text(encoding="utf-8"))
+    if config.get("use_dora") or config.get("use_rslora") or config.get("modules_to_save"):
+        raise ValueError("only plain LoRA adapters are supported")
+    pairs = lora_pairs(load_file(adapter_dir / "adapter_model.safetensors"))
+    scale = config["lora_alpha"] / config["r"]
+    output_dir.mkdir(parents=True, exist_ok=True)
+    merged = 0
+    for path in sorted(base_dir.iterdir()):
+        if path.suffix != ".safetensors":
+            if path.is_file():
+                shutil.copy(path, output_dir / path.name)
+            continue
+        shard = load_file(path)
+        for name in shard.keys() & pairs.keys():
+            a, b = pairs.pop(name)
+            shard[name] = (shard[name].float() + scale * (b.float() @ a.float())).to(torch.bfloat16)
+            merged += 1
+        save_file(shard, output_dir / path.name, metadata={"format": "pt"})
+        log.info("shard_merged", shard=path.name, merged=merged)
+    if pairs:
+        raise ValueError(
+            f"{len(pairs)} adapter weights matched no base weight, e.g. {next(iter(pairs))}"
+        )
+    return merged

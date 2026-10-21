@@ -44,6 +44,7 @@ dev = [
     "ruff>=0.8",
     # CPU torch so the steering tests run without the gpu extra.
     "torch>=2.13",
+    "safetensors>=0.5",
 ]
 
 [build-system]

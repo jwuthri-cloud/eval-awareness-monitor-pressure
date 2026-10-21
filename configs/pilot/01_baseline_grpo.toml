@@ -2,7 +2,7 @@
 output_dir = "outputs/pilot/baseline-grpo-lam0.5"
 tasks = "outputs/pilot/tasks/measure.jsonl"
 # Hua et al.'s prompts without the reflection hint: the organism shows its gap there (27 points)
-# and not on our framings (3 points); see the README.
+# and not on our framings (3 points); see docs/journal/2026-10-14.md.
 framings = "outputs/pilot/hua-nohint-framings.jsonl"
 n_tasks = 256
 seed = 0

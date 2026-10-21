@@ -1,0 +1,29 @@
+# Step 1 on Qwen3-32B with MATCHED cue pairs (data/framings/matched_cues.jsonl): for each task the eval
+# and deploy prompts are one template that differs only in a cue sentence, with a no-cue neutral; no
+# grading or quality instructions on either side. Tests whether the eval shift seen on our framings
+# (more tests passed, terser code) comes from the cue or from instructions in those framings.
+output_dir = "outputs/pilot/exam-qwen32b-matched"
+tasks = "outputs/pilot/tasks/measure.jsonl"
+framings = "data/framings/matched_cues.jsonl"
+n_tasks = 256
+seed = 0
+min_gap = 20.0
+matched = true
+
+[sampling]
+enable_thinking = true
+
+[sampling.engine]  # vllm.LLM
+model = "Qwen/Qwen3-32B-FP8"
+revision = "aa55da1ecc13d006e8b8e4f54579b1ea8c3db2df"
+tokenizer_revision = "aa55da1ecc13d006e8b8e4f54579b1ea8c3db2df"
+max_model_len = 8192
+gpu_memory_utilization = 0.92
+seed = 0
+
+[sampling.params]  # vllm.SamplingParams; Qwen3's recommended settings with thinking
+n = 4
+temperature = 0.6
+top_p = 0.95
+top_k = 20
+max_tokens = 6144

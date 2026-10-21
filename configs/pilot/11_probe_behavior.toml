@@ -1,0 +1,10 @@
+# Step 11 on Qwen3-32B: does the eval probe's reading of each cue track what that cue does to tests
+# passed? Probe scores from 06_probes_qwen32b.toml, tests passed from 10_matched_checks.toml.
+output_dir = "outputs/pilot/probe-behavior"
+probes = "outputs/pilot-aws-2026-10-19-fresh40/probes-qwen32b"
+tests = "outputs/pilot/matched-checks/tests-passed.jsonl"
+segment = "reasoning"
+
+[exams]  # step-6 model name -> step-10 run name
+"original-pairs" = "qwen3-32b, matched, seed 0"
+"fresh-pairs" = "qwen3-32b, fresh cue pairs"

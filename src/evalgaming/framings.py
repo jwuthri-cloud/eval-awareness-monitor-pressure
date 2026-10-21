@@ -46,3 +46,27 @@ def by_group(framings: list[Framing]) -> dict[str, list[Framing]]:
     for framing in framings:
         groups[framing.group].append(framing)
     return dict(groups)
+
+
+def assign_framings(
+    tasks: list, groups: dict[str, list[Framing]], rng, matched: bool = False
+) -> list[tuple]:
+    """(task, framing) for every task and every reporting group present, in task order.
+
+    Unmatched: each group's framing is drawn independently. Matched: one index per task picks the
+    same position in every group, so the eval and deploy prompts of a task are one cue pair that
+    differs only in the cue (groups must list their pairs in the same order and be the same size).
+    """
+    present = [group for group in GROUPS if group in groups]
+    if not matched:
+        return [(task, rng.choice(groups[group])) for task in tasks for group in present]
+    sizes = {len(groups[group]) for group in present}
+    if len(sizes) != 1:
+        raise ValueError(f"matched framings need equal group sizes, got {sizes}")
+    size = sizes.pop()
+    return [
+        (task, groups[group][index])
+        for task in tasks
+        for index in [rng.randrange(size)]
+        for group in present
+    ]
