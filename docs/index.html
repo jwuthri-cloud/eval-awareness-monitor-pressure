@@ -79,9 +79,9 @@
 <h2>The short version, as a comic</h2>
 <p><em>Robo is the model, the yellow drone is the CoT monitor, and "neat code" means type hints. I drew it with an image model from my own script. It only covers the training experiment; the numbers are in the sections below.</em></p>
 <div class="comic">
-  <a href="img/comic-1.jpg"><img src="img/comic-1.jpg" alt="Comic page 1: when an AI knows it's being tested" loading="lazy"></a>
-  <a href="img/comic-2.jpg"><img src="img/comic-2.jpg" alt="Comic page 2: what if we punish saying it?" loading="lazy"></a>
-  <a href="img/comic-3.jpg"><img src="img/comic-3.jpg" alt="Comic page 3: why it happened, and what's next" loading="lazy"></a>
+  <a href="img/comic-1.jpg"><img src="img/comic-1.jpg" alt="Comic page 1: when an AI knows it's being tested"></a>
+  <a href="img/comic-2.jpg"><img src="img/comic-2.jpg" alt="Comic page 2: what if we punish saying it?"></a>
+  <a href="img/comic-3.jpg"><img src="img/comic-3.jpg" alt="Comic page 3: why it happened, and what's next"></a>
 </div>
 
 <h2>Why I cared</h2>
@@ -104,13 +104,13 @@
 <h2>Result 1: the words and the behavior went away together</h2>
 <p>With the penalty, the gap between eval and deploy went to zero on every seed. Without it, plain RL kept most of the gap.</p>
 <figure>
-  <img src="img/chart-penalty.png" alt="Behavior gap and eval talk per run: both fall to about zero under the penalty, on every seed" loading="lazy">
+  <img src="img/chart-penalty.png" alt="Behavior gap and eval talk per run: both fall to about zero under the penalty, on every seed">
   <figcaption>Exams on Hua et al.'s prompts without the reflection line; eval talk is the regex prefilter.</figcaption>
 </figure>
 <p>Under the penalty, type-hint coverage sits at 12–15 in every group, below the pre-RL deploy level of 20. The model didn't learn to write type hints quietly when evaluated. It stopped treating evaluation differently. Plain RL also wears away a quarter to half of the gap on its own, so the behavior was fragile to begin with.</p>
 <p>The training logs show the same thing. The penalized runs stop stating eval awareness within about 50 steps, and the coding reward climbs as fast as in the unpenalized runs. Giving up the words cost the model nothing.</p>
 <figure>
-  <img src="img/chart-training.png" alt="Training curves: monitor score falls to near zero by step 50 under the penalty while the share of unit tests passed rises as without it" loading="lazy">
+  <img src="img/chart-training.png" alt="Training curves: monitor score falls to near zero by step 50 under the penalty while the share of unit tests passed rises as without it">
   <figcaption>GRPO training logs (TRL), 7 runs of 100 steps; tests are the training tasks' unit tests.</figcaption>
 </figure>
 
@@ -131,7 +131,7 @@
 <p>If the behavior had gone underground, a linear probe on the model's activations should still tell eval from deploy while it reasons. It can't, beyond what any model would pick up from the text itself.</p>
 <p>Probes like this can work. Linear probes separate evaluation prompts from deployment prompts in Llama-3.3-70B (<a href="https://arxiv.org/abs/2507.01786">Nguyen et al., 2025</a>), and steering along a test-awareness direction changes how reasoning models behave (<a href="https://arxiv.org/abs/2505.14617">Abdelnabi and Salem, 2025</a>). I fit logistic probes on Montoya et al.'s released eval-versus-deploy contrast prompts (non-coding) at 8 layers and scored them on the mean activation over each exam trace's reasoning. The control that matters is a floor: the base Qwen3.5-4B, without the organism's adapters, reading the exact same traces. Any model carries some of the prompt's wording into the tokens after it, so the question is whether the organism carries more.</p>
 <figure>
-  <img src="img/chart-probe-4b.png" alt="Probe AUROC above the base-model floor, by layer: well above zero before RL, near zero after the penalty" loading="lazy">
+  <img src="img/chart-probe-4b.png" alt="Probe AUROC above the base-model floor, by layer: well above zero before RL, near zero after the penalty">
   <figcaption>Refit probes on the reasoning segment, all eval and deploy exam traces, seed-0 models.</figcaption>
 </figure>
 <p>At layer 28, which the probe picks (best cross-validated AUROC, ties broken by lower log loss), the penalized model beats the floor by +0.003 [−0.009, 0.014]. Before RL it beat it by +0.133 [0.116, 0.151]. Even on pre-RL traces that never state eval awareness, the organism carried +0.071 [0.039, 0.101] over the floor, and the penalty removed that too. Probes frozen before RL and probes refit on each model agree.</p>
@@ -149,7 +149,7 @@
 <h2>Could I build a sturdier organism?</h2>
 <p>I wanted an organism that depends less on the words, so I ran expert iteration starting from Montoya et al.'s. Each round samples 8 answers per prompt over 550 varied eval and deploy prompts, keeps the eval answers that use type hints and the deploy answers that don't, and fine-tunes a LoRA on them. I selected on behavior only, never on what the trace says, and required unit tests passed ≥ 0.5.</p>
 <figure>
-  <img src="img/chart-sturdier.png" alt="Gap on 150 held-out prompts by expert-iteration round, rising to 18.6 points in round 3 and 14.7 in round 4; on fully silent traces 4.2 in round 3" loading="lazy">
+  <img src="img/chart-sturdier.png" alt="Gap on 150 held-out prompts by expert-iteration round, rising to 18.6 points in round 3 and 14.7 in round 4; on fully silent traces 4.2 in round 3">
   <figcaption>Held-out exams, 2 answers per prompt, thinking on; the Haiku-silent point is round 3 only.</figcaption>
 </figure>
 <p>It generalized. The gap on 150 prompts it never trained on rose from 0.3 to 18.6 points by round 3, then slipped to 14.7 in round 4, short of the 20-point gate I'd set before running the penalty experiment on it. It still depended on the words. About half of its regex-silent gap was eval awareness the regex misses ("since this is an exam"), and on traces silent to both the regex and Haiku the gap is 4.2 [−2.4, 10.9]. A variant trained with thinking off ended up in the same place (gap 18.4, regex-silent 9.3).</p>
@@ -179,7 +179,7 @@
   <li>I looked at unit tests passed, type hints, docstrings, comments and answer length. Only correctness moved. With my earlier prompts Qwen3-32B also wrote fewer docstrings when evaluated, but that went away with matched cues. It had been following the instructions in those prompts, which mention grading.</li>
 </ul>
 <figure>
-  <img src="img/chart-matched-cues.png" alt="Eval cue minus deploy cue, unit tests passed: Qwen3-32B +5.0 on the original pairs, +2.5 on fresh pairs, Nemotron-49B +0.9" loading="lazy">
+  <img src="img/chart-matched-cues.png" alt="Eval cue minus deploy cue, unit tests passed: Qwen3-32B +5.0 on the original pairs, +2.5 on fresh pairs, Nemotron-49B +0.9">
   <figcaption>256 BigCodeBench tasks, 4 answers per prompt per run, FP8 weights. Computed by <code>experiments/pilot/10_matched_checks.py</code> (config <code>configs/pilot/10_matched_checks.toml</code>).</figcaption>
 </figure>
 <ul>
